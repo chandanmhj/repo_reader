@@ -1,0 +1,8 @@
+{
+  "name": "repo-blueprint",
+  "private": true,
+  "type": "module",
+  "scripts": { "dev": "vite", "build": "vite build" },
+  "dependencies": { "mermaid": "^11.4.0", "react": "^18.3.1", "react-dom": "^18.3.1" },
+  "devDependencies": { "@vitejs/plugin-react": "^4.3.0", "vite": "^5.4.0" }
+}
