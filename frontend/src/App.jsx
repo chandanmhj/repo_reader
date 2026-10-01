@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import mermaid from "mermaid";
 
 const API = import.meta.env.VITE_API_URL;
@@ -69,6 +69,20 @@ function downloadPng(svg, name) {
   img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(new XMLSerializer().serializeToString(doc));
 }
 
+function Cursor() {
+  const r = useRef(null);
+  useEffect(() => {
+    if (!matchMedia("(hover:hover) and (pointer:fine)").matches) return;
+    let x = 0, y = 0, tx = 0, ty = 0, id;
+    const mv = (e) => { tx = e.clientX; ty = e.clientY; };
+    addEventListener("pointermove", mv);
+    const f = () => { x += (tx - x) * 0.18; y += (ty - y) * 0.18; r.current.style.transform = `translate(${x}px,${y}px)`; id = requestAnimationFrame(f); };
+    f();
+    return () => { removeEventListener("pointermove", mv); cancelAnimationFrame(id); };
+  }, []);
+  return <div ref={r} className="cur" aria-hidden="true" />;
+}
+
 export default function App() {
   const [url, setUrl] = useState("");
   const [busy, setBusy] = useState(false);
@@ -109,50 +123,67 @@ export default function App() {
   }
 
   return (
-    <main>
-      <h1>Repo Reader</h1>
-      <p className="lede">Paste a public GitHub repo. Get its architecture diagram, what it does, and how the code fits together.</p>
-      <form onSubmit={run}>
-        <input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://github.com/owner/repo" required />
-        <button disabled={busy}>{busy ? "Working..." : FREE ? "Analyze repo" : "Pay ₹1 and analyze"}</button>
-      </form>
-      {msg && <p className="note">{msg}</p>}
-      {err && <p className="err" role="alert">{err}</p>}
-      {res && (
-        <section className="out">
-          <h2>{res.repo}</h2>
-          <p>{res.description}</p>
-          {res.stats && (
-            <p className="stats">
-              Read {res.stats.files} code files ({Object.entries(res.stats.languages).map(([l, n]) => `${l} ${n}`).join(", ")}) and found {res.stats.modules} modules with {res.stats.connections} connections.
-            </p>
-          )}
-          <h3>Architecture</h3>
-          {svg && (
-            <div className="actions">
-              <button type="button" className="ghost" onClick={() => downloadPng(svg, res.repo.replace("/", "-") + "-architecture.png")}>Download PNG</button>
-              <button type="button" className="ghost" onClick={() => downloadSvg(svg, res.repo.replace("/", "-") + "-architecture.svg")}>Download SVG</button>
-            </div>
-          )}
-          <div className="legend">
-            <span><i style={{ background: "#dbeafe" }} />UI</span>
-            <span><i style={{ background: "#fde68a" }} />API</span>
-            <span><i style={{ background: "#dcfce7" }} />Logic</span>
-            <span><i style={{ background: "#fce7f3" }} />Data</span>
-            <span><i style={{ background: "#e5e7eb" }} />Config</span>
-            <span>Dotted arrow = HTTP call</span>
-          </div>
-          <div className="diagram" dangerouslySetInnerHTML={{ __html: svg }} />
-          <h3>How the code works</h3>
-          <p>{res.explanation}</p>
-          {res.stack.length > 0 && (
-            <div className="chips">{res.stack.map((s) => <span key={s}>{s}</span>)}</div>
-          )}
+    <>
+      <Cursor />
+      <header>
+        <div className="wrap">
+          <a className="logo" href="https://chandanmhj.in">CHANDAN MHJ</a>
+          <nav className="mono" aria-label="Main"><a href="https://products.chandanmhj.in">Products</a></nav>
+          <a className="btn mono" href="https://www.linkedin.com/in/chandanmhj" rel="noopener">Get in touch</a>
+        </div>
+      </header>
+      <main className="wrap">
+        <section className="head">
+          <p className="mono dim">01 / Developer tool</p>
+          <h1>Repo Reader</h1>
+          <p className="lede">Paste a public GitHub repo. Get its architecture diagram, what it does, and how the code fits together.</p>
         </section>
-      )}
-      <footer className="foot">
-        Built by Chandan Murthy HJ. <a href="https://chandanmhj.in" rel="noopener">Meet the creator</a>
+        <form onSubmit={run}>
+          <input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://github.com/owner/repo" aria-label="GitHub repo link" required />
+          <button className="go mono" disabled={busy}>{busy ? "Working..." : FREE ? "Analyze repo" : "Pay ₹1 and analyze"}</button>
+        </form>
+        {msg && <p className="note mono">{msg}</p>}
+        {err && <p className="err" role="alert">{err}</p>}
+        {res && (
+          <section className="out">
+            <div className="top mono"><span>[ Result ]</span><span>Architecture dossier</span></div>
+            <h2>{res.repo}</h2>
+            <p>{res.description}</p>
+            {res.stats && (
+              <p className="stats mono">
+                Read {res.stats.files} code files ({Object.entries(res.stats.languages).map(([l, n]) => `${l} ${n}`).join(", ")}) and found {res.stats.modules} modules with {res.stats.connections} connections.
+              </p>
+            )}
+            <h3 className="mono">Architecture</h3>
+            {svg && (
+              <div className="actions">
+                <button type="button" className="ghost mono" onClick={() => downloadPng(svg, res.repo.replace("/", "-") + "-architecture.png")}>Download PNG</button>
+                <button type="button" className="ghost mono" onClick={() => downloadSvg(svg, res.repo.replace("/", "-") + "-architecture.svg")}>Download SVG</button>
+              </div>
+            )}
+            <div className="legend mono">
+              <span><i style={{ background: "#dbeafe" }} />UI</span>
+              <span><i style={{ background: "#fde68a" }} />API</span>
+              <span><i style={{ background: "#dcfce7" }} />Logic</span>
+              <span><i style={{ background: "#fce7f3" }} />Data</span>
+              <span><i style={{ background: "#e5e7eb" }} />Config</span>
+              <span>Dotted arrow = HTTP call</span>
+            </div>
+            <div className="diagram" dangerouslySetInnerHTML={{ __html: svg }} />
+            <h3 className="mono">How the code works</h3>
+            <p>{res.explanation}</p>
+            {res.stack.length > 0 && (
+              <div className="chips mono">{res.stack.map((s) => <span key={s}>{s}</span>)}</div>
+            )}
+          </section>
+        )}
+      </main>
+      <footer>
+        <div className="wrap">
+          <a className="btn mono" href="https://chandanmhj.in" rel="noopener">Meet the developer</a>
+          <span className="mono dim">© 2026 Chandan MHJ</span>
+        </div>
       </footer>
-    </main>
+    </>
   );
 }
