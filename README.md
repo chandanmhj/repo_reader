@@ -1,4 +1,4 @@
-# Repo Blueprint
+# Repo Reader
 
 Paste a GitHub repo, get an architecture diagram, a description, and a technical explanation. ₹1 per analysis via Razorpay.
 
@@ -24,4 +24,5 @@ Use the service_role key in the backend only (it bypasses RLS). Never put it in 
 
 ## Notes
 - If Groq rejects `response_format` for your model, change `GROQ_MODEL` (e.g. a Llama model).
-- Parsing covers Python and JS/TS only, up to 40 files and 12 modules per repo.
+- The backend downloads the whole repo as a zip and reads every code file (Python, JS/TS, Java, Kotlin, Go). Limits: 40 MB download, 3000 code files, files over 200 KB and test/build/vendor folders skipped.
+- Set `GITHUB_TOKEN` in production: without it GitHub allows only about 60 API requests per hour per IP.

@@ -21,7 +21,7 @@ async function pay() {
   return new Promise((ok, no) =>
     new window.Razorpay({
       key: o.key, order_id: o.id, amount: o.amount, currency: "INR",
-      name: "Repo Blueprint", description: "One repo analysis",
+      name: "Repo Reader", description: "One repo analysis",
       handler: async (r) => {
         const v = await fetch(`${API}/verify`, {
           method: "POST", headers: { "Content-Type": "application/json" },
@@ -110,7 +110,7 @@ export default function App() {
 
   return (
     <main>
-      <h1>Repo Blueprint</h1>
+      <h1>Repo Reader</h1>
       <p className="lede">Paste a public GitHub repo. Get its architecture diagram, what it does, and how the code fits together.</p>
       <form onSubmit={run}>
         <input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://github.com/owner/repo" required />
@@ -150,6 +150,9 @@ export default function App() {
           )}
         </section>
       )}
+      <footer className="foot">
+        Built by Chandan Murthy HJ. <a href="https://chandanmhj.in" rel="noopener">Meet the creator</a>
+      </footer>
     </main>
   );
 }

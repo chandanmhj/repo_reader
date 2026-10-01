@@ -1,5 +1,5 @@
 {
-  "name": "repo-blueprint",
+  "name": "repo-reader",
   "private": true,
   "type": "module",
   "scripts": { "dev": "vite", "build": "vite build" },
